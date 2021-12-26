@@ -3,7 +3,7 @@
 
 # 목차
 * [저장소 관리 방법](#저장소-관리-방법)
-* [01-Ready for Study](01-ready-for-study/README.md)
+* [01-Ready for Study](01-ready-for-study)
 
 # 저장소 관리 방법
 스터디를 진행하며, 전체에 관련된 내용이 아닌 경우 모두 Directory를 통해 관리합니다.
