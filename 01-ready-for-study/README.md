@@ -10,7 +10,7 @@ Go언어 다운로드 페이지로 가서 Go언어를 설치해줍니다.
 * [Go 다운로드 링크](https://go.dev/dl/)
 ## Extension
 VsCode에 Go언어 Extension을 설치하여 VsCode에서 Go문법을 인식할 수 있도록 합니다.   
-[go_extension](image/go_extension.png)
+![go_extension](image/go_extension.png)
 ## 설치 확인
 ```shell
 $ go version
