@@ -1,65 +1,187 @@
-# 04 Go Package
-Go 언어가 어떻게 패키지를 관리하는지 알아봅시다.
-
-## 생각해야 할 것
-1. 내 노트북이 없는 상황에서 mongodb나 패키지 같은 의존성을 어떻게 보여줄 것인가
- -> AWS EC2?ㅋㅋ 😇
-2. 어떻게 해야 보기만 해도 개노잼인 클로저랑 defer를 잘 설명할 수 있을까...
-3. 커스텀 패키지 만들기 <- 일정 안에 할 수 있을지가 관건
+# 04 - Go Package
+Go 언어가 어떻게 패키지를 관리하는지 알아봅시다. 🤹‍♀️
 
 ## 외부함수 호출하는 방법 #3
-[참조 링크](https://github.com/Keunyoung-Jung/go-study-mysterico/issues/3)
+[참고 링크](https://github.com/Keunyoung-Jung/go-study-mysterico/issues/3)
 
-main.go
+
+## Go가 패키지를 관리하는 방법 (GOROOT / GOPATH)
+
+### `GOROOT`
+다음의 코드에서, `fmt` 패키지는 어디에서 가져오고 있는걸까?
 ```
 package main
 
-import (
-	"go-test/src/lib"
-)
+import "fmt"
 
 func main() {
-	lib.Return_grade(30)
+	fmt.Println("Hello, Go!")
 }
 ```
 
-go.mod
+정답은 GOROOT 아래의 `src` 디렉토리이다.
+`go env` 명령어로 GOROOT 위치를 알 수 있으며, 
+이곳에는 fmt 외에도 log, net과 같이 기본적으로 제공하는 모듈들이 위치해 있다.
+이 모듈들은 공식 문서의 [패키지 파트](https://golang.org/pkg/)에서도 볼 수 있다.
+
+
+![go의 기본 모듈들](image/go-basic-module.png)
+
+
+`import` 명령어는 지정된 디렉토리 내부에서 패키지를 찾는 명령어로, 그중에 `GOROOT/src`가 포함된다.
+물론 `GOROOT`는 단순히 패키지 관리만을 하는 곳은 아니다. 오히려 일종의 SDK에 가깝다.
+go를 실행하는 바이너리 파일과, 다른 환경(가령, [javascript와 같이 다른 언어로 된 프로젝트의 모듈로](https://m.blog.naver.com/sory1008/221794436126))에서 동작할 수 있게 하는 등의 다양한 라이브러리 등을 함께 포함한다. 그러므로 패키지를 추가하고 싶다고 해서 모든 go 프로젝트를 관할하는 `GOROOT/src`에 내가 원하는 패키지를 넣는 것은 그다지 바람직하지 않은 방법이다.
+
+그렇다면 외부 패키지를 저장할 경로를 필요로 하는데, 그곳이 `GOPATH`이다.
+
+---
+
+### `GOPATH`
+
+`GOPATH`는 외부 패키지의 모듈을 종합적으로 관리하는 곳이다.
+모듈을 설치하면 메인 디렉토리를 기준으로 모듈의 소스 파일이 저장된다.
+
+
+써드파티 패키지를 통해 `GOPATH`가 어떻게 동작하는지 확인해보도록 하자.
+간단히 `HTTP status`에 따른 log를 출력하는 프로그램을 만들어볼 것이며,
+[logrus](https://github.com/sirupsen/logrus)라는 패키지를 사용할 것이다.
+
+[프로젝트](example/without-modules/main.go)
+
+
+다음엔 간단한 커스텀 패키지를 만들어서 `GOPATH`의 동작 방식을 확인해보자.
+url에 `GET`방식으로 request를 보내 response에 포함된 [`HTTP status`](https://developer.mozilla.org/ko/docs/Web/HTTP/Status)를 반환하는 함수를 동작시킬 것이다.
+
+[프로젝트]()
+
+
+
+### 실행 방법
+
+`go get -d "github.com/sirupsen/logrus"`로 logrus 모듈을 `GOPATH/src`에 설치한다.
+(이때, 저장 위치는 `GOPATH/pkg/mod/github.com/{작성자}/{패키지명}@{버전}`이 된다.)
+
+---
+
+#### 그렇다면?
+
+**Q1**. 설치된 logrus 모듈은 몇 버전을 사용하고 있는가?
+
+**Q2**. 만일 다른 버전을 사용하고 싶다면 어떻게 해야할까?
+
+**Q3**. A 프로젝트에서 버전 `v1.0.0`을 사용했다. 그러나 B 프로젝트에서 `v1.7.1`을 사용해야만 한다. 그럼 어떻게 해야할까?
+
+
+.
+
+.
+
+.
+
+.
+
+.
+
+.
+
+
+**A1**. `logrus`는 최신 버전(2022.01.10 기준 `v1.8.1`)의 패키지를 받아온다. 이는 해당 링크의 `master repository`에서 가장 최신 버전의 tag를 받아오기 때문이다.
+
+(물론 github에서만 패키지를 받아오는 것은 아니다. 다양한 환경에서 package를 받아올 수 있다. <- 중앙 저장소를 지향하지 않는 이유와 일맥상통할까?)
+
+**A2**. `go get` 명령어는 버전 단위의 다운로드를 지원한다. `go get github.com/sirupsen/logrus@v1.0.1` 등의 명령어를 사용하면 된다.
+
+**A3**. `GOPATH`는 환경변수이다. 즉, 변경 가능하다는 의미이다. 디렉토리 내부에 `bin`/`pkg`/`src`의 디렉토리가 갖춰지면 정상적으로 동작이 가능하다.
+
+
+
+#### 어떤 점이 불편한가?
+
+1. 하나의 워크스페이스(GOPATH)가 모든 프로젝트의 패키지를 관리해야하는 구조이다. 의존성 관리 중 충돌이 발생하거나 각각의 패키지가 서로에 영향을 끼치는 경우가 발생할 수 있다. 
+2. `GOPATH`가 변경 가능하다고 하더라도, 여러 개의 프로젝트를 진행하며 매번 환경변수를 바꿔야하는 번거로움은 적절한 의존성 관리라고 할 수 없다.
+3. 작성자가 버전을 기술해주지 않는 이상 정확한 버전 관리가 이루어지지 않는다. 다른 개발자가 코드를 이어받았을 때 그 버전에 대해 알 수 없다는 점은 코드 관리에 치명적이다.
+
+
+#### 다른 곳은 어떻게 이런 문제를 관리할까??
+1. `SpringBoot`, `Node.js`, `Flutter`와 같은 언어/프레임워크는 하나의 프로젝트에 대하여 의존성 관리와 프로젝트 정의를 위한 파일을 가지고 있다(`build.gradle`등.., `package.json`, `pubspec.yaml`).
+2. 이와 같은 문서를 통해 프로젝트에 대해 적절한 의존성과 버전을 확인할 수 있고 바로 설치할 수도 있다(물론 다음 프레임워크들은 모두 중앙 저장소를 가지고 있긴 하다).
+
+
+#### 이런 문제를 어떤 식으로 해결하려 했을까?
+1. 일일이 `GOPATH`를 변경해가며 프로젝트를 작성한다.
+2. 벤더링을 통해 버전 일관성 문제를 해결한다.
+3. 도커 이미지 등에 GO 환경을 구축해 활용한다.
+4. *go-modules*를 활용한다.
+
+
+---
+
+
+## `go.mod`
+go가 이런 문제에 의해 `v1.11`부터 지원하기 시작한 것이 `go-modules`이다. `v1.16`부터 표준이 되었다. `mod`는 `modules`의 약자로, `go-modules`를 활용하기 위한 파일이다.
+
+
+
 ```
-module go-test
-
-go 1.17
+module sample
+go 1.16
+require (
+	github.com/aliyun/aliyun-oss-go-sdk v2.0.5+incompatible
+	github.com/artdarek/go-unzip v0.0.0-20180315101617-33dc05190e4b
+	github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496
+	github.com/baiyubin/aliyun-sts-go-sdk v0.0.0-20180326062324-cfa1a18b161f // indirect
+	github.com/extrame/ole2 v0.0.0-20160812065207-d69429661ad7 // indirect
+	github.com/go-sql-driver/mysql v1.5.0
+	github.com/go-xorm/xorm v0.7.9
+	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
+	github.com/labstack/echo v3.3.10+incompatible
+	github.com/pangpanglabs/echoswagger v1.1.0
+	github.com/pangpanglabs/goutils v0.0.0-20200116103626-3f9fcfaa29b0
+	github.com/sergeilem/xls v0.0.1
+	github.com/tealeg/xlsx v1.0.5
+	github.com/urfave/cli v1.22.2
+	golang.org/x/image v0.0.0-20200119044424-58c23975cae1
+)
 ```
 
-## 왜 `go.mod`를 만들지 않으면 읽지 못하는 걸까?
-여기에 서술할 내용
-1. 일반적으로 상대 경로의 모듈은 어떻게 읽히는가?
-2. Go에서는 패키지를 어떻게 읽는가?
-3. Go.mod를 쓰지 않으면 어떻게 해결할 수 있는가?
-4. 여기서 간단한 써드파티 패키지를 쓸 수 있는 프로젝트를 만들어서 예시를 들어보자
-    ```
-    1. 웹 프레임워크를 하나 받아와서 프론트랑 연동되는 간단한 게시판 하나 짜기(with mongo...)
-    2. 의존성들을 추가함
-    3. 이 웹사이트가 몇 버전으로 유지되는지 확인함
-    4. spring에서 swagger 3.0이랑 2.x 버전 예시를 들기(ㅋㅋ)
-    ```
 
-
-## Go가 패키지를 관리하는 방법
-1. url을 기준으로 패키지를 받아오는 go의 특성 (deno에서도 씀)
-2. 다른 언어들은 어떤 식으로 패키지를 관리하는가?
-3. go의 `bin`/`pkg`/`src` 디렉토리에 관하여
-4. 이 방법의 문제점
-
-
-### GOPATH / GOROOT
-1. ㅈㄱㄴ
-2. 이거 어떻게 관리하는지
-3. 그래서 어떤 식으로 써야하는지
+### `go-modules`는 어떤 식으로 동작할까?
+(`GOPATH`와 `go-modules` 비교하기)
 
 
 ## Go-modules의 이점
-1. 버전 관리가 가능해짐
-2. 모두가 동일한 환경에서 개발을 할 수 있어짐(가령 프로젝트를 github에 올렸을 때)
-3. 위에서 나온 프로젝트를 go-modules로 개발해보기
-4. 그리고 어떤 이점이 있는지 알아내기
-5. 커스텀 패키지 만들기(할수잇을가..ㅋ.ㅋ)
+1. 버전 관리가 용이해지며, 프로젝트 당 하나의 `go.mod`로 관리되기 때문에 의존성 간의 충돌이 일어날 확률이 낮아진다.
+2. github에 코드를 올린 경우에도 `go.mod` 파일을 통해 제3자도 의존성 및 버전을 확인하고 바로 설치할 수 있다.
+
+
+## `Go-modules`를 활용해 써드파티 패키지를 관리해보자
+(여기에 깃허브 링크)
+(접근제어 및 별칭, 패키지 종류도 여기에 기술되어야 함!)
+
+
+
+---
+
+## 참고 자료
+
+https://go.dev/doc/
+
+https://go.dev/blog/using-go-modules
+
+https://www.jetbrains.com/help/go/configuring-goroot-and-gopath.html
+
+https://pronist.tistory.com/86
+
+https://korband.tistory.com/23
+
+https://jbhs7014.tistory.com/182
+
+https://www.digitalocean.com/community/tutorials/understanding-the-gopath
+
+https://wookiist.dev/90
+
+https://stackoverflow.com/questions/10383498/how-does-go-update-third-party-packages
+
+https://www.popit.kr/%EA%B3%A0-%EB%AA%A8%EB%93%88%EC%9D%84-%EC%82%AC%EC%9A%A9%ED%95%98%EC%97%AC-%ED%8C%A8%ED%82%A4%EC%A7%80-%EA%B5%AC%EC%84%B1-%EB%B0%A9%EB%B2%95-%EA%B0%9C%EC%84%A0%ED%95%98%EA%B8%B0/
+
+https://thebook.io/006806/ch06/04/02_02/
