@@ -24,6 +24,8 @@ import "fmt"
 func main() {
 	fmt.Println("Hello, Go!")
 }
+
+
 ```
 
 <br />
@@ -197,7 +199,7 @@ require (
 
 ## `Go-modules`를 활용해 써드파티 패키지를 관리해보자
 
-[프로젝트](https://github.com/parjom/go-test)
+[프로젝트](https://github.com/yesyeseo/Golang-Study/tree/ottl-seo/%5B16%5D%20Package/usepkg)
 
 <br />
 
@@ -230,3 +232,5 @@ https://thebook.io/006806/ch06/04/02_02/
 http://golang.site/go/article/15-Go-%ED%8C%A8%ED%82%A4%EC%A7%80
 
 https://blogs.halodoc.io/go-modules-implementation/
+
+https://github.com/yesyeseo/Golang-Study/tree/ottl-seo/%5B16%5D%20Package
