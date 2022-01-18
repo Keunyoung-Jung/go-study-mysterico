@@ -206,6 +206,7 @@ func main() {
 	list.Append("hello")
 	list.Append(1.5)
 
+	fmt.Println("{ prev   index   value   next       }")
 	firstNode := list.First()
 	fmt.Println(*firstNode)
 	nextNode := firstNode.Next()
@@ -222,10 +223,10 @@ Output
 ```
 { prev   index   value   next       }
 {<nil>        0 [1 2]   0xc00007c180}
-{0xc00007c150 1 hello 0xc00007c1b0}
-{0xc00007c180 2 1.5   <nil>       }
+{0xc00007c150 1 hello   0xc00007c1b0}
+{0xc00007c180 2 1.5     <nil>       }
 세번째 노드에서 이전으로 돌아가기
-{0xc00007c150 1 hello 0xc00007c1b0}
+{0xc00007c150 1 hello   0xc00007c1b0}
 ```
 
 ### 사실은 ..

@@ -49,6 +49,7 @@ func main() {
 	list.Append("hello")
 	list.Append(1.5)
 
+	mt.Println("{ prev   index   value   next       }")
 	firstNode := list.First()
 	fmt.Println(*firstNode)
 	nextNode := firstNode.Next()
