@@ -26,7 +26,6 @@ func (list *List) Append(value interface{}){
 		list.head = node
 		list.head.prev = nil
 		list.head.index = 0
-		list.tail = node
 	} else {
 		list.tail.next = node
 		node.prev = list.tail
