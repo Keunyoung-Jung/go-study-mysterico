@@ -20,7 +20,7 @@ func (list *List) First()(*Node){
 	return list.head
 }
 
-func (list *List) Append(value interface{})(*Node){
+func (list *List) Append(value interface{}){
 	node := &Node{value: value}
 	if list.head == nil {
 		list.head = node
@@ -33,7 +33,6 @@ func (list *List) Append(value interface{})(*Node){
 		node.index = list.tail.index +1
 	}
 	list.tail = node
-	return nil
 }
 
 func (node *Node) Next()(*Node){
