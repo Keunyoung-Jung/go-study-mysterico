@@ -7,6 +7,8 @@
 * [02-Why Study Go Language](02-why-study-go-lang)
 * [03-go basic](03-go-basic)
 * [04-go package](04-go-package)
+* [05-data types](05-data-types)
+* [06-concurrency](06-concurrency)
 
 
 # 저장소 관리 방법
